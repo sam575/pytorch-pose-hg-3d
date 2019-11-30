@@ -70,5 +70,5 @@ class Debugger(object):
     for i, v in self.imgs.items():
       cv2.imshow('{}'.format(i), v)
     if pause:
-      cv2.waitKey()
+      cv2.waitKey(30)
     
