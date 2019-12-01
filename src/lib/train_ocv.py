@@ -71,10 +71,10 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     loss = crit_ocv(output, torch.argmax(ocv_gt, 1))
     preds = torch.argmax(output, 1)
 
-    # if split == 'train':
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
+    if split == 'train':
+      optimizer.zero_grad()
+      loss.backward()
+      optimizer.step()
     # else:
     #   input_ = batch['input'].cpu().numpy().copy()
     #   input_[0] = flip(input_[0]).copy()[np.newaxis, ...]
@@ -98,8 +98,9 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
       # pred = get_preds(output[-1]['hm'].detach().cpu().numpy())
       # preds.append(convert_eval_format(pred, conf, meta)[0])
     
+    acc = accuracy_ocv(preds, torch.argmax(ocv_gt, 1))
     Loss_ocv.update(loss.item(), img.size(0))
-    Acc_ocv.update(accuracy_ocv(preds, torch.argmax(ocv_gt, 1)))
+    Acc_ocv.update(acc, img.size(0))
     # Loss.update(loss.item(), batch['input'].size(0))
     # Loss3D.update(loss_3d.item(), batch['input'].size(0))
     # Acc.update(accuracy(output[-1]['hm'].detach().cpu().numpy(), 
@@ -127,8 +128,11 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     Bar.suffix = '{split}: [{0}][{1}/{2}] |Total {total:} |ETA {eta:} '\
                  '|Loss_ocv {loss.avg:.5f}'\
                  '|Acc_ocv {Acc.avg:.4f}'\
+                 '|loss_batch {loss_batch:.4f}'\
+                 '|acc_batch {acc_batch:.4f}'\
                  '{time_str}'.format(epoch, i, nIters, total=bar.elapsed_td, 
-                                     eta=bar.eta_td, loss=Loss_ocv, Acc=Acc_ocv, 
+                                     eta=bar.eta_td, loss=Loss_ocv, Acc=Acc_ocv,
+                                     loss_batch=loss.item(), acc_batch=acc, 
                                      split=split, time_str=time_str)
 
     if opt.print_iter > 0:
@@ -167,8 +171,8 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
   #         'acc': Acc.avg, 
   #         'mpjpe': MPJPE.avg,
   #         'time': bar.elapsed_td.total_seconds() / 60.}, preds
-  return {'los_ocvs': Loss_ocv.avg, 
-          'acc_ocv': Acc_ocv.avg, 
+  return {'loss': Loss_ocv.avg, 
+          'acc': Acc_ocv.avg, 
           'time': bar.elapsed_td.total_seconds() / 60.}, preds
   
 def train_3d(epoch, opt, train_loader, model, optimizer):

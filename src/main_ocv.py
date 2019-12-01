@@ -53,9 +53,9 @@ def main(opt):
 
   val_loader = torch.utils.data.DataLoader(
       Dataset(opt, 'val'), 
-      batch_size=1, 
+      batch_size=opt.batch_size * len(opt.gpus), 
       shuffle=False,
-      num_workers=1,
+      num_workers=opt.num_workers,
       pin_memory=True
   )
 

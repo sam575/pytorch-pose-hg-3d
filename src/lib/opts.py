@@ -6,7 +6,7 @@ class opts():
   def __init__(self):
     self.parser = argparse.ArgumentParser()
 
-    self.parser.add_argument('--exp_id', default = 'ocv_0')
+    self.parser.add_argument('--exp_id', default = 'ocv_2')
     self.parser.add_argument('--gpus', default='0,1', help='-1 for CPU')
     self.parser.add_argument('--num_workers', type=int, default=4)
     self.parser.add_argument('--test', action = 'store_true', help = 'test')
@@ -40,7 +40,7 @@ class opts():
     self.parser.add_argument('--lr', type=float, default=0.001)
     self.parser.add_argument('--lr_step', type=str, default='90,120')
     self.parser.add_argument('--num_epochs', type=int, default=140)
-    self.parser.add_argument('--val_intervals', type=int, default=5)
+    self.parser.add_argument('--val_intervals', type=int, default=1)
     self.parser.add_argument('--batch_size', type=int, default=32)
     self.parser.add_argument('--arch', default = 'msra_50', 
                              help = 'hg | msra_xxx')

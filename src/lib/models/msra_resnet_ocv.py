@@ -143,11 +143,18 @@ class PoseResNet(nn.Module):
 
         # self.final_layer = nn.ModuleList(self.final_layer)
 
-        self.final_conv1 = nn.Conv2d(256, 16, kernel_size=3, stride=2, bias=False)
+        # self.final_conv1 = nn.Conv2d(256, 16, kernel_size=3, stride=2, bias=False)
+        # self.final_maxpool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.final_conv1 = nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1, bias=False)
         self.final_maxpool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.final_conv2 = nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1, bias=False)
+        self.final_maxpool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+
         self.flatten = nn.Flatten()
-        self.final_linear = nn.Linear(3600, self.num_views)
-        # self.final_linear = nn.Linear(16*16*16, self.num_views)
+        # self.final_linear = nn.Linear(3600, self.num_views)
+        self.dropout = nn.Dropout(0.9)
+        self.final_linear = nn.Linear(16*16*16, self.num_views)
 
 
 
@@ -226,7 +233,10 @@ class PoseResNet(nn.Module):
 
         x = self.final_conv1(x)
         x = self.final_maxpool1(x)
+        x = self.final_conv2(x)
+        x = self.final_maxpool2(x)        
         x = self.flatten(x)
+        x = self.dropout(x)
         ret = self.final_linear(x)
 
         # return [ret]

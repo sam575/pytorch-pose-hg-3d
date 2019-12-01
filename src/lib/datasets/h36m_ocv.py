@@ -44,6 +44,8 @@ class H36M(data.Dataset):
     self.nSamples = len(self.annot['id']) * self.num_views
     self.image_dir = os.path.join(self.opt.data_dir, 'h36m', 'images')
     self.err_thresh = 0.5
+    self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
+    self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
     
     print 'Loaded 3D {} {} samples'.format(split, len(self.annot['id']))
   
@@ -53,6 +55,12 @@ class H36M(data.Dataset):
     path = '{}/{}/{}_{:06d}.jpg'.format(self.image_dir, folder, folder, self.annot['id'][index])
     # print 'path', path
     img = cv2.imread(path)
+
+    if img is None:
+      print('Missing image:')
+      print(path)
+      # img = np.zeros((256,256,3))
+
     return img
   
   def GetPartInfo(self, index, cam_num):
@@ -111,10 +119,21 @@ class H36M(data.Dataset):
     info = {'index': index, 'cam_num': cam_num}
 
     img = self.LoadImage(index, cam_num)
+
+    if img is None:
+      img = np.zeros((256,256,3))
+      print(info)
+
+    # remove division by 256 after crop
+    # img = (img.astype(np.float32) / 256. - self.mean) / self.std
+    # img = img.transpose(2, 0, 1)
+
     pts, c, s, pts_3d, pts_3d_mono = self.GetPartInfo(index, cam_num)   
     pts_3d[7] = (pts_3d[12] + pts_3d[13]) / 2
       
-    inp = Crop(img, c, s, 0, ref.inputRes) / 256.
+    inp = Crop(img, c, s, 0, ref.inputRes) / 256
+    # inp = Crop(img, c, s, 0, ref.inputRes)
+
     # outMap = np.zeros((ref.nJoints, ref.outputRes, ref.outputRes))
     # outReg = np.zeros((ref.nJoints, 3))
     # for i in range(ref.nJoints):
@@ -123,6 +142,7 @@ class H36M(data.Dataset):
         # outMap[i] = DrawGaussian(outMap[i], pt[:2], ref.hmGauss) 
       # outReg[i, 2] = pt[2] / ref.outputRes * 2 - 1
     
+    # inp = torch.from_numpy(inp).float()
     inp = torch.from_numpy(inp)
     ocv_gt = torch.from_numpy(ocv_gt)
     # return inp, outMap, outReg, pts_3d_mono
