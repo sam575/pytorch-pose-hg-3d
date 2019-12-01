@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 def get_preds(hm, return_conf=False):
   assert len(hm.shape) == 4, 'Input must be a 4-D tensor'
@@ -54,6 +55,12 @@ def accuracy(output, target, acc_idxs):
     return 0
   else:
     return avg_acc / (len(acc_idxs) - bad_idx_count)
+
+def accuracy_ocv(output, target):
+  # num = output.shape[0]
+  # return torch.sum(output == target)/num
+  matching = (output == target).to(torch.float)
+  return torch.mean(matching)
 
 def get_preds_3d(heatmap, depthmap):
   output_res = max(heatmap.shape[2], heatmap.shape[3])

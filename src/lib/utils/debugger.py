@@ -79,14 +79,14 @@ class Debugger(object):
   def show_img(self, pause = False, imgId = 'default'):
     cv2.imshow('{}'.format(imgId), self.imgs[imgId])
     if pause:
-      cv2.waitKey()
+      cv2.waitKey(0)
   
   def show_all_imgs(self, pause = False):
     if not self.ipynb:
       for i, v in self.imgs.items():
         cv2.imshow('{}'.format(i), v)
       if pause:
-        cv2.waitKey()
+        cv2.waitKey(0)
     else:
       self.ax = None
       nImgs = len(self.imgs)

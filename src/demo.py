@@ -16,6 +16,8 @@ from utils.debugger import Debugger
 from utils.image import get_affine_transform, transform_preds
 from utils.eval import get_preds, get_preds_3d
 
+import pdb
+
 image_ext = ['jpg', 'jpeg', 'png']
 mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
 std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
@@ -40,12 +42,14 @@ def demo_image(image, model, opt):
   pred = transform_preds(pred, c, s, (opt.output_w, opt.output_h))
   pred_3d = get_preds_3d(out['hm'].detach().cpu().numpy(), 
                          out['depth'].detach().cpu().numpy())[0]
+
+  pdb.set_trace()
   
   debugger = Debugger()
   debugger.add_img(image)
   debugger.add_point_2d(pred, (255, 0, 0))
   debugger.add_point_3d(pred_3d, 'b')
-  debugger.show_all_imgs(pause=False)
+  debugger.show_all_imgs(pause=True)
   debugger.show_3d()
 
 def main(opt):
@@ -73,6 +77,8 @@ def main(opt):
     print('Running {} ...'.format(opt.demo))
     image = cv2.imread(opt.demo)
     demo_image(image, model, opt)
+
+  pdb.set_trace()
     
 
 if __name__ == '__main__':

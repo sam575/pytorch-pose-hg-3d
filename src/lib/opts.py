@@ -6,14 +6,14 @@ class opts():
   def __init__(self):
     self.parser = argparse.ArgumentParser()
 
-    self.parser.add_argument('--exp_id', default = 'default')
-    self.parser.add_argument('--gpus', default='0', help='-1 for CPU')
+    self.parser.add_argument('--exp_id', default = 'ocv_0')
+    self.parser.add_argument('--gpus', default='0,1', help='-1 for CPU')
     self.parser.add_argument('--num_workers', type=int, default=4)
     self.parser.add_argument('--test', action = 'store_true', help = 'test')
     self.parser.add_argument('--debug', type = int, default = 0)
     self.parser.add_argument('--demo', default = '', help = 'path/to/image')
 
-    self.parser.add_argument('--task', default='human2d')
+    self.parser.add_argument('--task', default='human3d')
     self.parser.add_argument('--ratio_3d', type=float, default=0)
     self.parser.add_argument('--weight_3d', type=float, default=0)
     self.parser.add_argument('--weight_var', type=float, default=0)
@@ -110,5 +110,7 @@ class opts():
 
     if opt.resume:
       opt.load_model = '{}/model_last.pth'.format(opt.save_dir)
+
+    # opt.thre
 
     return opt
