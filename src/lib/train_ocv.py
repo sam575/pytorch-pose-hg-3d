@@ -41,10 +41,15 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
   time_str = ''
 
   nIters = len(data_loader)
+  if opt.train_half:
+    nIters = nIters/2
   bar = Bar('{}'.format(opt.exp_id), max=nIters)
   
   end = time.time()
   for i, batch in enumerate(data_loader):
+    if i>=nIters:
+      break
+  
     data_time.update(time.time() - end)
     # for k in batch:
     #   if k != 'meta':

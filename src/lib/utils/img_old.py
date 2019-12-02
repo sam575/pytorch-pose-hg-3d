@@ -133,7 +133,9 @@ def Crop(img, center, scale, rot, res):
   if scaleFactor < 2:
     newImg = cv2.resize(newImg, (res, res))
   
+  # return newImg.transpose(2, 0, 1).astype(np.float32)
   return newImg.transpose(2, 0, 1).astype(np.float32)
+
 
 def Gaussian(sigma):
   if sigma == 7:

@@ -57,8 +57,9 @@ class H36M(data.Dataset):
     img = cv2.imread(path)
 
     if img is None:
-      print('Missing image:')
-      print(path)
+      pass
+      # print('Missing image:')
+      # print(path)
       # img = np.zeros((256,256,3))
 
     return img
@@ -121,18 +122,16 @@ class H36M(data.Dataset):
     img = self.LoadImage(index, cam_num)
 
     if img is None:
-      img = np.zeros((256,256,3))
-      print(info)
+      img = np.zeros((224,224,3))
+      # print(info)
+      pass
 
-    # remove division by 256 after crop
-    # img = (img.astype(np.float32) / 256. - self.mean) / self.std
-    # img = img.transpose(2, 0, 1)
 
     pts, c, s, pts_3d, pts_3d_mono = self.GetPartInfo(index, cam_num)   
     pts_3d[7] = (pts_3d[12] + pts_3d[13]) / 2
       
-    inp = Crop(img, c, s, 0, ref.inputRes) / 256
-    # inp = Crop(img, c, s, 0, ref.inputRes)
+    # inp = Crop(img, c, s, 0, ref.inputRes) / 256
+    inp = Crop(img, c, s, 0, ref.inputRes)
 
     # outMap = np.zeros((ref.nJoints, ref.outputRes, ref.outputRes))
     # outReg = np.zeros((ref.nJoints, 3))
@@ -141,7 +140,14 @@ class H36M(data.Dataset):
       # if pts[i][0] > 1:
         # outMap[i] = DrawGaussian(outMap[i], pt[:2], ref.hmGauss) 
       # outReg[i, 2] = pt[2] / ref.outputRes * 2 - 1
-    
+
+    # remove division by 256 after crop
+    if img.shape[0] == 3:
+      # 3,224,224 -> 224,224,3
+      img = img.transpose(2, 0, 1)
+    img = (img.astype(np.float32) / 256. - self.mean) / self.std
+    img = img.transpose(2, 0, 1) # commented transpose in Crop
+
     # inp = torch.from_numpy(inp).float()
     inp = torch.from_numpy(inp)
     ocv_gt = torch.from_numpy(ocv_gt)

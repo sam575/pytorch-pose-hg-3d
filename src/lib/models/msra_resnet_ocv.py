@@ -146,15 +146,26 @@ class PoseResNet(nn.Module):
         # self.final_conv1 = nn.Conv2d(256, 16, kernel_size=3, stride=2, bias=False)
         # self.final_maxpool1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.final_conv1 = nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1, bias=False)
-        self.final_maxpool1 = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.final_conv2 = nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1, bias=False)
-        self.final_maxpool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+        # self.final_conv1 = nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1, bias=False)
+        # self.final_maxpool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        # self.final_conv2 = nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1, bias=False)
+        # self.final_maxpool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.flatten = nn.Flatten()
-        # self.final_linear = nn.Linear(3600, self.num_views)
-        self.dropout = nn.Dropout(0.9)
-        self.final_linear = nn.Linear(16*16*16, self.num_views)
+        # self.flatten = nn.Flatten()
+        # # self.final_linear = nn.Linear(3600, self.num_views)
+        # self.dropout = nn.Dropout(0.9)
+        # self.final_linear = nn.Linear(16*16*16, self.num_views)
+
+        self.final_layers = nn.Sequential(
+                                        nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1, bias=False),
+                                        nn.ReLU(),
+                                        nn.MaxPool2d(kernel_size=2, stride=2),
+                                        nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1, bias=False),
+                                        nn.ReLU(),
+                                        nn.MaxPool2d(kernel_size=2, stride=2),
+                                        nn.Flatten(),
+                                        nn.Dropout(0.5),
+                                        nn.Linear(16*16*16, self.num_views))
 
 
 
@@ -231,13 +242,14 @@ class PoseResNet(nn.Module):
         # for head in self.heads:
         #     ret[head] = self.__getattr__(head)(x)
 
-        x = self.final_conv1(x)
-        x = self.final_maxpool1(x)
-        x = self.final_conv2(x)
-        x = self.final_maxpool2(x)        
-        x = self.flatten(x)
-        x = self.dropout(x)
-        ret = self.final_linear(x)
+        # x = self.final_conv1(x)
+        # x = self.final_maxpool1(x)
+        # x = self.final_conv2(x)
+        # x = self.final_maxpool2(x)        
+        # x = self.flatten(x)
+        # x = self.dropout(x)
+        # ret = self.final_linear(x)
+        ret = self.final_layers(x)
 
         # return [ret]
         return ret

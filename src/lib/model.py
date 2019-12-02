@@ -5,12 +5,24 @@ import os
 
 # from models.msra_resnet import get_pose_net
 from models.msra_resnet_ocv import get_pose_net
+import pdb
+
+def freeze_model(model):
+  print('Freezing initial layers')
+  modules = list(model.children())
+  # freeze last but one module
+  for child in modules[:-1]:
+    for param in child.parameters():
+      param.requires_grad = False
 
 def create_model(opt): 
   if 'msra' in opt.arch:
     print("=> using msra resnet '{}'".format(opt.arch))
     num_layers = int(opt.arch[opt.arch.find('_') + 1:])
     model = get_pose_net(num_layers, opt.heads)
+    if opt.freeze_initial_layers:
+      freeze_model(model)
+    # pdb.set_trace()
     optimizer = torch.optim.Adam(model.parameters(), opt.lr)
   else:
     assert 0, "Model not supported!"
