@@ -126,7 +126,6 @@ class H36M(data.Dataset):
       # print(info)
       pass
 
-
     pts, c, s, pts_3d, pts_3d_mono = self.GetPartInfo(index, cam_num)   
     pts_3d[7] = (pts_3d[12] + pts_3d[13]) / 2
       
