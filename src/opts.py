@@ -7,12 +7,12 @@ class opts():
     self.parser = argparse.ArgumentParser()
     
   def init(self):
-    self.parser.add_argument('-expID', default = 'default', help = 'Experiment ID')
+    self.parser.add_argument('-expID', default = 'hg_0', help = 'Experiment ID')
     self.parser.add_argument('-test', action = 'store_true', help = 'test')
     self.parser.add_argument('-DEBUG', type = int, default = 0, help = 'DEBUG level')
     self.parser.add_argument('-demo', default = '', help = 'path/to/demo/image')
     
-    self.parser.add_argument('-loadModel', default = 'none', help = 'Provide full path to a previously trained model')
+    self.parser.add_argument('-loadModel', default = 'model_weights/hgreg-3d.pth', help = 'Provide full path to a previously trained model')
     self.parser.add_argument('-nFeats', type = int, default = 256, help = '# features in the hourglass')
     self.parser.add_argument('-nStack', type = int, default = 2, help = '# hourglasses to stack')
     self.parser.add_argument('-nModules', type = int, default = 2, help = '# residual modules at each hourglass')
@@ -20,7 +20,7 @@ class opts():
     self.parser.add_argument('-LR', type = float, default = 2.5e-4, help = 'Learning Rate')
     self.parser.add_argument('-dropLR', type = int, default = 1000000, help = 'drop LR')
     self.parser.add_argument('-nEpochs', type = int, default = 60, help = '#training epochs')
-    self.parser.add_argument('-valIntervals', type = int, default = 5, help = '#valid intervel')
+    self.parser.add_argument('-valIntervals', type = int, default = 1, help = '#valid intervel')
     self.parser.add_argument('-trainBatch', type = int, default = 6, help = 'Mini-batch size')
     
     self.parser.add_argument('-nRegModules', type = int, default = 2, help = '#depth regression modules')
@@ -28,7 +28,8 @@ class opts():
     self.parser.add_argument('-regWeight', type = float, default = 0, help = 'depth regression loss weight')
     self.parser.add_argument('-varWeight', type = float, default = 0, help = 'variance loss weight')
     
-    
+    self.parser.add_argument('--gpus', default='0,1', help='-1 for CPU')
+      
   def parse(self):
     self.init()  
     self.opt = self.parser.parse_args()
@@ -50,4 +51,9 @@ class opts():
       opt_file.write('==> Args:\n')
       for k, v in sorted(refs.items()):
          opt_file.write('  %s: %s\n' % (str(k), str(v)))
+
+    opt.root_dir = os.path.join(os.path.dirname(__file__), '..')
+    opt.data_dir = os.path.join(opt.root_dir, 'data')
+    opt.gpus = [int(gpu) for gpu in opt.gpus.split(',')]
+
     return self.opt

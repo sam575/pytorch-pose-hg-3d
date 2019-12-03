@@ -62,6 +62,7 @@ class HourglassNet3D(nn.Module):
   def __init__(self, nStack, nModules, nFeats, nRegModules):
     super(HourglassNet3D, self).__init__()
     self.num_views = 3
+
     self.nStack = nStack
     self.nModules = nModules
     self.nFeats = nFeats
@@ -98,7 +99,16 @@ class HourglassNet3D(nn.Module):
     self.tmpOut_ = nn.ModuleList(_tmpOut_)
     self.reg_ = nn.ModuleList(_reg_)
     
-    self.reg = nn.Linear(4 * 4 * self.nFeats, self.num_views)
+    self.reg = nn.Linear(4 * 4 * self.nFeats, ref.nJoints)
+
+    _ocv_layers_ = []
+    for i in range(4):
+      for j in range(self.nRegModules):
+        _ocv_layers_.append(Residual(self.nFeats, self.nFeats))
+
+    self.ocv_layers_ = nn.ModuleList(_ocv_layers_)
+    self.ocv_reg = nn.Linear(4 * 4 * self.nFeats, self.num_views) 
+
     
   def forward(self, x):
     x = self.conv1_(x)
@@ -124,14 +134,25 @@ class HourglassNet3D(nn.Module):
       tmpOut_ = self.tmpOut_[i](tmpOut)
       x = x + ll_ + tmpOut_
     
+    depth = x.clone()
+    ocv = x.clone()
+
     for i in range(4):
       for j in range(self.nRegModules):
-        x = self.reg_[i * self.nRegModules + j](x)
-      x = self.maxpool(x)
+        depth = self.reg_[i * self.nRegModules + j](depth)
+      depth = self.maxpool(depth)
+
+    for i in range(4):
+      for j in range(self.nRegModules):
+        ocv = self.ocv_layers_[i * self.nRegModules + j](ocv)
+      ocv = self.maxpool(ocv)
       
-    x = x.view(x.size(0), -1)
-    reg = self.reg(x)
+    depth = depth.view(x.size(0), -1)
+    reg = self.reg(depth)
     out.append(reg)
+
+    ocv = ocv.view(x.size(0), -1)
+    ocv = self.ocv_reg(ocv)
     
-    return out
+    return out, ocv
 
