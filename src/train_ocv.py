@@ -9,6 +9,8 @@ import ref
 from progress.bar import Bar
 
 import torch.nn.functional as F
+import torch.nn as nn
+import pdb
 
 def step(split, epoch, opt, dataLoader, model, criterion, optimizer = None):
   if split == 'train':
@@ -21,9 +23,13 @@ def step(split, epoch, opt, dataLoader, model, criterion, optimizer = None):
   crit_ocv = nn.CrossEntropyLoss()
   
   nIters = len(dataLoader)
+  if opt.train_half:
+    nIters = int(nIters/20)
   bar = Bar('==>', max=nIters)
   
   for i, (input, target2D, target3D, meta, ocv_gt) in enumerate(dataLoader):
+    if i>=nIters:
+      break
     input_var = torch.autograd.Variable(input).float().cuda()
     target2D_var = torch.autograd.Variable(target2D).float().cuda()
     target3D_var = torch.autograd.Variable(target3D).float().cuda()
@@ -42,14 +48,20 @@ def step(split, epoch, opt, dataLoader, model, criterion, optimizer = None):
       debugger.showImg()
       debugger.saveImg('debug/{}.png'.format(i))
 
-    # ocv_gt = ocv_gt.cuda(device=opt.device, non_blocking=True)
+    # print(preds_ocv.shape, ocv_gt.shape)
     ocv_gt = ocv_gt.cuda()
-    loss = crit_ocv(preds_ocv, torch.argmax(ocv_gt, 1))
-    Loss_ocv.update(loss.data[0], input.size(0))
+    # pdb.set_trace()
+    # ocv_gt = ocv_gt.cuda()
+    # print(preds_ocv.shape, ocv_gt.shape)
 
-    loss_3d = FusionCriterion(opt.regWeight, opt.varWeight)(reg, target3D_var)
-    Loss3D.update(loss_3d.data[0], input.size(0))
-    loss += loss_3d
+    loss = FusionCriterion(opt.regWeight, opt.varWeight)(reg, target3D_var)
+    Loss3D.update(loss.data[0], input.size(0))
+    # pdb.set_trace()
+    # loss += loss_3d.item()
+
+    loss_ocv = crit_ocv(preds_ocv, torch.argmax(ocv_gt, 1))
+    Loss_ocv.update(loss_ocv.item(), input.size(0))
+    loss += loss_ocv
 
     for k in range(opt.nStack):
       loss += criterion(output[k], target2D_var)

@@ -61,7 +61,7 @@ class Hourglass(nn.Module):
 class HourglassNet3D(nn.Module):
   def __init__(self, nStack, nModules, nFeats, nRegModules):
     super(HourglassNet3D, self).__init__()
-    self.num_views = 3
+    self.num_views = 4
 
     self.nStack = nStack
     self.nModules = nModules

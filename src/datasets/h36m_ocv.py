@@ -11,7 +11,7 @@ from utils.img import Crop, DrawGaussian, Transform3D
 from utils.img import Crop, DrawGaussian, Transform3D
 # import ref
 import h5py
-
+import os
 import pdb
 
 class H36M(data.Dataset):
@@ -19,7 +19,7 @@ class H36M(data.Dataset):
     self.split = split
     self.opt = opt
 
-    print '==> initializing 3D {} data.'.format(split)
+    print('==> initializing 3D {} data.'.format(split))
     annot = {}
     tags = ['action', 'bbox', 'id', 'joint_2d_gt', 'joint_2d_pred', 'joint_3d_gt', 'mpjpe', 'subaction', 'subject']
 
@@ -45,7 +45,7 @@ class H36M(data.Dataset):
     self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
     self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
     
-    print 'Loaded 3D {} {} samples'.format(split, len(self.annot['id']))
+    print('Loaded 3D {} {} samples'.format(split, len(self.annot['id'])))
   
   def LoadImage(self, index, cam_num):
     folder = 's_{:02d}_act_{:02d}_subact_{:02d}_ca_{:02d}'.format(self.annot['subject'][index], self.annot['action'][index], \
@@ -88,7 +88,7 @@ class H36M(data.Dataset):
     # if self.split == 'train':
       # index = np.random.randint(self.nSamples * self.num_views)
 
-    index = index/self.num_views
+    index = int(index/self.num_views)
     cam_num = index % self.num_views
     # cam_num = np.random.randint(self.num_views)
     err = self.annot['mpjpe'][index]
@@ -150,6 +150,7 @@ class H36M(data.Dataset):
     ocv_gt = torch.from_numpy(ocv_gt)
     # return inp, outMap, outReg, pts_3d_mono
     # return inp, ocv_gt
+    # pdb.set_trace()
     return inp, outMap, outReg, pts_3d_mono, ocv_gt
     
   def __len__(self):

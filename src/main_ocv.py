@@ -7,9 +7,9 @@ import torch.utils.data
 from opts import opts
 import ref
 from utils.utils import adjust_learning_rate
-from datasets.fusion import Fusion
+# from datasets.fusion import Fusion
 # from datasets.h36m import H36M
-from datasets.mpii import MPII
+# from datasets.mpii import MPII
 from utils.logger import Logger
 # from train import train, val
 
@@ -30,8 +30,10 @@ def main():
 
 
   if opt.loadModel != '':
-    checkpoint = torch.load(opt.loadModel, map_location=lambda storage, loc: storage)
-    print('loaded {}, epoch {}'.format(opt.load_model, checkpoint['epoch']))
+    # checkpoint = torch.load(opt.loadModel, map_location=lambda storage, loc: storage)
+    checkpoint = torch.load(opt.loadModel, map_location=lambda storage, loc: storage, encoding='latin1')
+    print('loaded {}'.format(opt.loadModel))
+    # print('loaded {}, epoch {}'.format(opt.loadModel, checkpoint['epoch']))
     if type(checkpoint) == type({}):
       state_dict = checkpoint['state_dict']
     else:
@@ -51,19 +53,19 @@ def main():
                                   weight_decay = ref.weightDecay, 
                                   momentum = ref.momentum)
 
-  if opt.ratio3D < ref.eps:
-    val_loader = torch.utils.data.DataLoader(
-        MPII(opt, 'val', returnMeta = True), 
-        batch_size = opt.trainBatch, 
-        shuffle = False,
-        num_workers = int(ref.nThreads)
-    )
-  else:
-    val_loader = torch.utils.data.DataLoader(
-        H36M(opt, 'val'), 
-        batch_size = opt.trainBatch, 
-        shuffle = False,
-        num_workers = int(ref.nThreads)
+  # if opt.ratio3D < ref.eps:
+  #   val_loader = torch.utils.data.DataLoader(
+  #       MPII(opt, 'val', returnMeta = True), 
+  #       batch_size = opt.trainBatch, 
+  #       shuffle = False,
+  #       num_workers = int(ref.nThreads)
+  #   )
+  # else:
+  val_loader = torch.utils.data.DataLoader(
+      H36M(opt, 'val'), 
+      batch_size = opt.trainBatch, 
+      shuffle = False,
+      num_workers = int(ref.nThreads)
     )
   
 
@@ -71,8 +73,15 @@ def main():
     val(0, opt, val_loader, model, criterion)
     return
 
+  # train_loader = torch.utils.data.DataLoader(
+  #     Fusion(opt, 'train'), 
+  #     batch_size = opt.trainBatch, 
+  #     shuffle = True if opt.DEBUG == 0 else False,
+  #     num_workers = int(ref.nThreads)
+  # )
+
   train_loader = torch.utils.data.DataLoader(
-      Fusion(opt, 'train'), 
+      H36M(opt, 'train'), 
       batch_size = opt.trainBatch, 
       shuffle = True if opt.DEBUG == 0 else False,
       num_workers = int(ref.nThreads)

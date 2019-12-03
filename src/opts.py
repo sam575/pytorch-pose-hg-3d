@@ -19,14 +19,14 @@ class opts():
 
     self.parser.add_argument('-LR', type = float, default = 2.5e-4, help = 'Learning Rate')
     self.parser.add_argument('-dropLR', type = int, default = 1000000, help = 'drop LR')
-    self.parser.add_argument('-nEpochs', type = int, default = 60, help = '#training epochs')
+    self.parser.add_argument('-nEpochs', type = int, default = 20, help = '#training epochs')
     self.parser.add_argument('-valIntervals', type = int, default = 1, help = '#valid intervel')
-    self.parser.add_argument('-trainBatch', type = int, default = 6, help = 'Mini-batch size')
+    self.parser.add_argument('-trainBatch', type = int, default = 16, help = 'Mini-batch size')
     
     self.parser.add_argument('-nRegModules', type = int, default = 2, help = '#depth regression modules')
-    self.parser.add_argument('-ratio3D', type = int, default = 0, help = 'weak label data ratio')
-    self.parser.add_argument('-regWeight', type = float, default = 0, help = 'depth regression loss weight')
-    self.parser.add_argument('-varWeight', type = float, default = 0, help = 'variance loss weight')
+    self.parser.add_argument('-ratio3D', type = int, default = 1, help = 'weak label data ratio')
+    self.parser.add_argument('-regWeight', type = float, default = 0.1, help = 'depth regression loss weight')
+    self.parser.add_argument('-varWeight', type = float, default = 0.01, help = 'variance loss weight')
     
     self.parser.add_argument('--gpus', default='0,1', help='-1 for CPU')
       
@@ -52,8 +52,9 @@ class opts():
       for k, v in sorted(refs.items()):
          opt_file.write('  %s: %s\n' % (str(k), str(v)))
 
-    opt.root_dir = os.path.join(os.path.dirname(__file__), '..')
-    opt.data_dir = os.path.join(opt.root_dir, 'data')
-    opt.gpus = [int(gpu) for gpu in opt.gpus.split(',')]
+    self.opt.root_dir = os.path.join(os.path.dirname(__file__), '..')
+    self.opt.data_dir = os.path.join(self.opt.root_dir, 'data')
+    self.opt.gpus = [int(gpu) for gpu in self.opt.gpus.split(',')]
+    self.opt.train_half = True
 
     return self.opt
