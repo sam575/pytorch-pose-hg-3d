@@ -112,6 +112,6 @@ class opts():
       opt.load_model = '{}/model_last.pth'.format(opt.save_dir)
 
     opt.freeze_initial_layers = False
-    opt.train_half = False
+    opt.train_half = True
 
     return opt

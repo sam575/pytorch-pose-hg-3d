@@ -49,7 +49,7 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
   for i, batch in enumerate(data_loader):
     if i>=nIters:
       break
-  
+
     data_time.update(time.time() - end)
     # for k in batch:
     #   if k != 'meta':
@@ -58,9 +58,15 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     #   device=opt.device, non_blocking=True).float() / opt.output_h
 
     img, ocv_gt, info = batch
+
+    if i==0:
+      np.savez(split+'_debug.npz', img=img.numpy(), ocv_gt=ocv_gt.numpy(), info=info)
+
     img = img.cuda(device=opt.device, non_blocking=True)
     ocv_gt = ocv_gt.cuda(device=opt.device, non_blocking=True)
     output = model(img)
+
+
 
     # loss = crit(output[-1]['hm'], batch['target'])
     # loss_3d = crit_3d(

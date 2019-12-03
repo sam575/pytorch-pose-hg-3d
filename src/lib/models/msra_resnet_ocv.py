@@ -167,6 +167,14 @@ class PoseResNet(nn.Module):
                                         nn.Dropout(0.5),
                                         nn.Linear(16*16*16, self.num_views))
 
+        # self.final_layers = nn.Sequential(
+        #     # nn.Conv2d(2048, 2048, kernel_size=3, stride=2, padding=1, bias=False),
+        #     # nn.ReLU(),
+        #     # nn.MaxPool2d(kernel_size=2, stride=2),
+        #     nn.Flatten(),
+        #     nn.Linear(2048*8*8, self.num_views)
+        #     )
+
 
 
     def _make_layer(self, block, planes, blocks, stride=1):

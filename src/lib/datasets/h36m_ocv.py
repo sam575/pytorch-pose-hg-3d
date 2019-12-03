@@ -13,8 +13,9 @@ from utils.image import transform_preds
 from utils.img_old import Crop, DrawGaussian, Transform3D
 # from utils.image import Crop
 import ref
-
 import h5py
+
+import pdb
 
 class H36M(data.Dataset):
   def __init__(self, opt, split):
@@ -130,7 +131,7 @@ class H36M(data.Dataset):
     pts_3d[7] = (pts_3d[12] + pts_3d[13]) / 2
       
     # inp = Crop(img, c, s, 0, ref.inputRes) / 256
-    inp = Crop(img, c, s, 0, ref.inputRes)
+    img = Crop(img, c, s, 0, ref.inputRes)
 
     # outMap = np.zeros((ref.nJoints, ref.outputRes, ref.outputRes))
     # outReg = np.zeros((ref.nJoints, 3))
@@ -143,12 +144,12 @@ class H36M(data.Dataset):
     # remove division by 256 after crop
     if img.shape[0] == 3:
       # 3,224,224 -> 224,224,3
-      img = img.transpose(2, 0, 1)
+      img = img.transpose(1,2,0)
     img = (img.astype(np.float32) / 256. - self.mean) / self.std
     img = img.transpose(2, 0, 1) # commented transpose in Crop
 
     # inp = torch.from_numpy(inp).float()
-    inp = torch.from_numpy(inp)
+    inp = torch.from_numpy(img)
     ocv_gt = torch.from_numpy(ocv_gt)
     # return inp, outMap, outReg, pts_3d_mono
     return inp, ocv_gt, info
