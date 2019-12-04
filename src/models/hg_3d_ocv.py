@@ -59,9 +59,10 @@ class Hourglass(nn.Module):
     return up1 + up2
 
 class HourglassNet3D(nn.Module):
-  def __init__(self, nStack, nModules, nFeats, nRegModules):
+  def __init__(self, nStack, nModules, nFeats, nRegModules, opt):
     super(HourglassNet3D, self).__init__()
     self.num_views = 4
+    self.opt = opt
 
     self.nStack = nStack
     self.nModules = nModules
@@ -107,7 +108,9 @@ class HourglassNet3D(nn.Module):
         _ocv_layers_.append(Residual(self.nFeats, self.nFeats))
 
     self.ocv_layers_ = nn.ModuleList(_ocv_layers_)
-    self.ocv_reg = nn.Linear(4 * 4 * self.nFeats, self.num_views) 
+    self.ocv_reg = nn.Linear(4 * 4 * self.nFeats, self.num_views)
+    if self.opt.err_reg:
+      self.ocv_err_cls = nn.Linear(4 * 4 * self.nFeats, self.num_views) 
 
     
   def forward(self, x):
@@ -152,7 +155,9 @@ class HourglassNet3D(nn.Module):
     out.append(reg)
 
     ocv = ocv.view(x.size(0), -1)
-    ocv = self.ocv_reg(ocv)
+    ocv_reg = self.ocv_reg(ocv)
+    if self.opt.err_reg:
+      return out, ocv_reg, self.ocv_err_cls(ocv)
     
-    return out, ocv
+    return out, ocv_reg
 

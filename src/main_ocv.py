@@ -17,6 +17,19 @@ from train_ocv import train, val
 from models.hg_3d_ocv import HourglassNet3D
 from datasets.h36m_ocv import H36M
 
+def freeze_model(model, opt):
+  print('Freezing initial layers')
+  modules = list(model.children())
+  # freeze last but one module
+  for child in modules[:-opt.num_freeze]:
+    print(child)
+    for name, param in child.named_parameters():
+      param.requires_grad = False
+      print(name)
+
+  print('Unfreezed parameters')
+  print(modules[-opt.num_freeze:])
+
 def main():
   opt = opts().parse()
   now = datetime.datetime.now()
@@ -26,7 +39,7 @@ def main():
   #   model = torch.load(opt.loadModel).cuda()
   # else:
   # model = HourglassNet3D(opt.nStack, opt.nModules, opt.nFeats, opt.nRegModules).cuda()
-  model = HourglassNet3D(opt.nStack, opt.nModules, opt.nFeats, opt.nRegModules)
+  model = HourglassNet3D(opt.nStack, opt.nModules, opt.nFeats, opt.nRegModules, opt)
 
 
   if opt.loadModel != '':
@@ -39,6 +52,9 @@ def main():
     else:
       state_dict = checkpoint.state_dict()
     model.load_state_dict(state_dict, strict=False)
+
+  if opt.freeze_layers:
+    freeze_model(model, opt)
 
   opt.device = torch.device('cuda:{}'.format(opt.gpus[0]))
   if len(opt.gpus) > 1:

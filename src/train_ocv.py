@@ -24,7 +24,7 @@ def step(split, epoch, opt, dataLoader, model, criterion, optimizer = None):
   
   nIters = len(dataLoader)
   if opt.train_half:
-    nIters = int(nIters/20)
+    nIters = int(nIters/3)
   bar = Bar('==>', max=nIters)
   
   for i, (input, target2D, target3D, meta, ocv_gt) in enumerate(dataLoader):
@@ -36,7 +36,10 @@ def step(split, epoch, opt, dataLoader, model, criterion, optimizer = None):
 
     # target_ocv_var = torch.autograd.Variable(target_ocv).float().cuda()
     
-    output, preds_ocv = model(input_var)
+    if opt.err_reg:
+      output, preds_ocv, preds_ocv_cls = model(input_var)
+    else:
+      output, preds_ocv = model(input_var)
     reg = output[opt.nStack]
     if opt.DEBUG >= 2:
       gt = getPreds(target2D.cpu().numpy()) * 4
@@ -49,7 +52,7 @@ def step(split, epoch, opt, dataLoader, model, criterion, optimizer = None):
       debugger.saveImg('debug/{}.png'.format(i))
 
     # print(preds_ocv.shape, ocv_gt.shape)
-    ocv_gt = ocv_gt.cuda()
+    ocv_gt = ocv_gt.cuda().float()
     # pdb.set_trace()
     # ocv_gt = ocv_gt.cuda()
     # print(preds_ocv.shape, ocv_gt.shape)
@@ -59,7 +62,14 @@ def step(split, epoch, opt, dataLoader, model, criterion, optimizer = None):
     # pdb.set_trace()
     # loss += loss_3d.item()
 
-    loss_ocv = crit_ocv(preds_ocv, torch.argmax(ocv_gt, 1))
+    # pdb.set_trace()
+    if opt.multi_class:
+      loss_ocv = F.binary_cross_entropy_with_logits(preds_ocv.float(), ocv_gt.float())
+    elif opt.err_reg:
+      loss_ocv = 0.01 * F.mse_loss(preds_ocv, ocv_gt)
+      loss_ocv += crit_ocv(preds_ocv_cls, torch.argmin(ocv_gt, 1))
+    else:
+      loss_ocv = crit_ocv(preds_ocv, torch.argmax(ocv_gt, 1))
     Loss_ocv.update(loss_ocv.item(), input.size(0))
     loss += loss_ocv
 
@@ -70,8 +80,12 @@ def step(split, epoch, opt, dataLoader, model, criterion, optimizer = None):
     Acc.update(Accuracy((output[opt.nStack - 1].data).cpu().numpy(), (target2D_var.data).cpu().numpy()))
     mpjpe, num3D = MPJPE((output[opt.nStack - 1].data).cpu().numpy(), (reg.data).cpu().numpy(), meta)
 
-    # acc_ocv = ((preds_ocv >= opt.ocv_thresh).float() == target_ocv_var).float().mean()
-    acc_ocv = (torch.argmax(preds_ocv, 1) == torch.argmax(ocv_gt, 1)).float().mean()
+    if opt.multi_class:
+      acc_ocv = ((preds_ocv >= opt.ocv_thresh).float() == ocv_gt.float()).float().mean()
+    elif opt.err_reg:
+      acc_ocv = (torch.argmax(preds_ocv_cls, 1) == torch.argmin(ocv_gt, 1)).float().mean()
+    else:
+      acc_ocv = (torch.argmax(preds_ocv, 1) == torch.argmax(ocv_gt, 1)).float().mean()
     Acc_ocv.update(acc_ocv, input.size(0))
 
     if num3D > 0:

@@ -41,7 +41,6 @@ class H36M(data.Dataset):
     self.num_views = self.annot['mpjpe'].shape[-1]
     self.nSamples = len(self.annot['id']) * self.num_views
     self.image_dir = os.path.join(self.opt.data_dir, 'h36m', 'images')
-    self.err_thresh = 0.5
     self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
     self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
     
@@ -96,7 +95,13 @@ class H36M(data.Dataset):
     min_err_ind = np.argmin(err)
     ocv_gt = np.zeros(self.num_views)
     ocv_gt[min_err_ind] = 1
-    # ocv_gt[err < (min_err + self.err_thresh)] = 1
+
+    if self.opt.multi_class:
+      self.opt.err_thresh = (np.max(err) - np.min(err))/2
+      ocv_gt[err <= (min_err + self.opt.err_thresh)] = 1
+    elif self.opt.err_reg:
+      ocv_gt = err.copy()
+
 
     # correct camera indices w.r.t actual rotation
     ## 2 4

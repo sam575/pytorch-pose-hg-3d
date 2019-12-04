@@ -21,7 +21,7 @@ class opts():
     self.parser.add_argument('-dropLR', type = int, default = 1000000, help = 'drop LR')
     self.parser.add_argument('-nEpochs', type = int, default = 20, help = '#training epochs')
     self.parser.add_argument('-valIntervals', type = int, default = 1, help = '#valid intervel')
-    self.parser.add_argument('-trainBatch', type = int, default = 16, help = 'Mini-batch size')
+    self.parser.add_argument('-trainBatch', type = int, default = 64, help = 'Mini-batch size')
     
     self.parser.add_argument('-nRegModules', type = int, default = 2, help = '#depth regression modules')
     self.parser.add_argument('-ratio3D', type = int, default = 1, help = 'weak label data ratio')
@@ -56,5 +56,14 @@ class opts():
     self.opt.data_dir = os.path.join(self.opt.root_dir, 'data')
     self.opt.gpus = [int(gpu) for gpu in self.opt.gpus.split(',')]
     self.opt.train_half = True
+    # self.opt.scale_loss3d = 5
+    self.opt.freeze_layers = True
+    self.opt.num_freeze = 2
+    self.opt.multi_class = True
+    self.opt.err_thresh = 2
+    self.opt.ocv_thresh = 0.5
+    self.opt.err_reg = False
+    if self.opt.err_reg:
+      self.opt.num_freeze = 3
 
     return self.opt
