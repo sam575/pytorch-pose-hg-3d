@@ -37,7 +37,9 @@ def step(split, epoch, opt, dataLoader, model, criterion, optimizer = None):
     if i>=nIters:
       break
 
-    input = input.transpose(0,1)
+    # print(input.shape)
+    # input = input.transpose(0,1)
+    # print(input.shape)
 
     input_var = torch.autograd.Variable(input).float().cuda()
     target2D_var = torch.autograd.Variable(target2D).float().cuda()
