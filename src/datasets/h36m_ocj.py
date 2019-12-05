@@ -48,7 +48,7 @@ class H36M(data.Dataset):
   
   def LoadImage(self, index):
     all_imgs = []
-    for cam_num in range(4):
+    for cam_num in range(self.opt.num_views):
       folder = 's_{:02d}_act_{:02d}_subact_{:02d}_ca_{:02d}'.format(self.annot['subject'][index], self.annot['action'][index], \
                 self.annot['subaction'][index], cam_num+1)
       path = '{}/{}/{}_{:06d}.jpg'.format(self.image_dir, folder, folder, self.annot['id'][index])
@@ -102,11 +102,11 @@ class H36M(data.Dataset):
     ocv_gt = np.zeros(self.num_views)
     ocv_gt[min_err_ind] = 1
 
-    if self.opt.multi_class:
-      self.opt.err_thresh = (np.max(err) - np.min(err))/2
-        ocv_gt[err <= (min_err + self.opt.err_thresh)] = 1
-    elif self.opt.err_reg:
-      ocv_gt = err.copy()
+    # if self.opt.multi_class:
+    #   self.opt.err_thresh = (np.max(err) - np.min(err))/2
+    #     ocv_gt[err <= (min_err + self.opt.err_thresh)] = 1
+    # elif self.opt.err_reg:
+    #   ocv_gt = err.copy()
 
     # print(index, cam_num, )
     # # correct camera indices w.r.t actual rotation
