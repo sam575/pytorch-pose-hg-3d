@@ -148,30 +148,18 @@ class HourglassNet3D(nn.Module):
         ll_ = self.ll_[i](ll)
         tmpOut_ = self.tmpOut_[i](tmpOut)
         x = x + ll_ + tmpOut_
+   
+      for i in range(4):
+        for j in range(self.nRegModules):
+          x = self.ocj_layers_[i * self.nRegModules + j](x)
+        x = self.maxpool(x)
+      
+      x = x.view(ocj.size(0), -1)
+      ocj_reg = self.ocj_reg(x)
 
-      feats.append(x)
-    
-    # depth = x.clone()
-    # print(len(feats),feats[0].shape)
-    # ocj = x.clone()
+      all_prob.append(ocj_reg)
 
-    # for i in range(4):
-    #   for j in range(self.nRegModules):
-    #     depth = self.reg_[i * self.nRegModules + j](depth)
-    #   depth = self.maxpool(depth)
-
-    # out will nstack * 4 # ignore out in train
-    comb = torch.stack(feats)
-    comb = torch.transpose(comb,0,1) # b,4,c,h,w
-    ocj = comb.reshape(comb.shape[0],-1,comb.shape[-2],comb.shape[-1])
-
-    # print(ocj.shape)
-
-    for i in range(4):
-      for j in range(self.nRegModules):
-        ocj = self.ocj_layers_[i * self.nRegModules + j](ocj)
-      ocj = self.maxpool(ocj)
-
+    all_prob = torch.stack(all_prob).transpose(0,1).squeeze()
    
     return out, all_prob
 
