@@ -7,7 +7,7 @@ class opts():
     self.parser = argparse.ArgumentParser()
     
   def init(self):
-    self.parser.add_argument('-expID', default = 'err_cam_0', help = 'Experiment ID')
+    self.parser.add_argument('-expID', default = 'all_cam_0', help = 'Experiment ID')
     self.parser.add_argument('-test', action = 'store_true', help = 'test')
     self.parser.add_argument('-DEBUG', type = int, default = 0, help = 'DEBUG level')
     self.parser.add_argument('-demo', default = '', help = 'path/to/demo/image')
@@ -17,7 +17,7 @@ class opts():
     self.parser.add_argument('-nStack', type = int, default = 2, help = '# hourglasses to stack')
     self.parser.add_argument('-nModules', type = int, default = 2, help = '# residual modules at each hourglass')
 
-    self.parser.add_argument('-LR', type = float, default = 2.5e-5, help = 'Learning Rate')
+    self.parser.add_argument('-LR', type = float, default = 2.5e-4, help = 'Learning Rate')
     self.parser.add_argument('-dropLR', type = int, default = 1000000, help = 'drop LR')
     self.parser.add_argument('-nEpochs', type = int, default = 20, help = '#training epochs')
     self.parser.add_argument('-valIntervals', type = int, default = 1, help = '#valid intervel')
@@ -58,13 +58,13 @@ class opts():
     self.opt.train_half = False
     # self.opt.scale_loss3d = 5
     self.opt.num_views = 4
-    self.opt.freeze_layers = False
+    self.opt.freeze_layers = True
     self.opt.num_freeze = 2
     self.opt.multi_class = False
     self.opt.err_thresh = 2
     self.opt.ocv_thresh = 0.5
     self.opt.err_reg = False
-    self.opt.err_cam = True
+    self.opt.err_cam = False
     if self.opt.err_reg:
       self.opt.num_freeze = 3
 

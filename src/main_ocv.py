@@ -13,9 +13,14 @@ from utils.utils import adjust_learning_rate
 from utils.logger import Logger
 # from train import train, val
 
-from train_ocv import train, val
-from models.hg_3d_ocv import HourglassNet3D
-from datasets.h36m_ocv import H36M
+# from train_ocv import train, val
+# from models.hg_3d_ocv import HourglassNet3D
+# from datasets.h36m_ocv import H36M
+
+from train_ocj import train, val
+from models.hg_3d_ocj import HourglassNet3D
+from datasets.h36m_ocj import H36M
+
 
 def freeze_model(model, opt):
   print('Freezing initial layers')
