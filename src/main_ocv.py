@@ -22,10 +22,10 @@ def freeze_model(model, opt):
   modules = list(model.children())
   # freeze last but one module
   for child in modules[:-opt.num_freeze]:
-    print(child)
+    # print(child)
     for name, param in child.named_parameters():
       param.requires_grad = False
-      print(name)
+      # print(name)
 
   print('Unfreezed parameters')
   print(modules[-opt.num_freeze:])
@@ -80,6 +80,7 @@ def main():
   val_loader = torch.utils.data.DataLoader(
       H36M(opt, 'val'), 
       batch_size = opt.trainBatch, 
+      # batch_size = 1, 
       shuffle = False,
       num_workers = int(ref.nThreads)
     )

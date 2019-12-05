@@ -7,7 +7,7 @@ class opts():
     self.parser = argparse.ArgumentParser()
     
   def init(self):
-    self.parser.add_argument('-expID', default = 'hg_0', help = 'Experiment ID')
+    self.parser.add_argument('-expID', default = 'single_0', help = 'Experiment ID')
     self.parser.add_argument('-test', action = 'store_true', help = 'test')
     self.parser.add_argument('-DEBUG', type = int, default = 0, help = 'DEBUG level')
     self.parser.add_argument('-demo', default = '', help = 'path/to/demo/image')
@@ -57,12 +57,14 @@ class opts():
     self.opt.gpus = [int(gpu) for gpu in self.opt.gpus.split(',')]
     self.opt.train_half = True
     # self.opt.scale_loss3d = 5
+    self.opt.num_views = 4
     self.opt.freeze_layers = True
     self.opt.num_freeze = 2
-    self.opt.multi_class = True
+    self.opt.multi_class = False
     self.opt.err_thresh = 2
     self.opt.ocv_thresh = 0.5
     self.opt.err_reg = False
+    self.opt.err_cam = False
     if self.opt.err_reg:
       self.opt.num_freeze = 3
 

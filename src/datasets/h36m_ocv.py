@@ -87,12 +87,15 @@ class H36M(data.Dataset):
     # if self.split == 'train':
       # index = np.random.randint(self.nSamples * self.num_views)
 
-    index = int(index/self.num_views)
     cam_num = index % self.num_views
+    index = int(index/self.num_views)
     # cam_num = np.random.randint(self.num_views)
     err = self.annot['mpjpe'][index]
     min_err = np.min(err)
     min_err_ind = np.argmin(err)
+    if self.err_cam:
+      min_err = np.max(err)
+      min_err_ind = np.argmax(err)
     ocv_gt = np.zeros(self.num_views)
     ocv_gt[min_err_ind] = 1
 
@@ -102,7 +105,7 @@ class H36M(data.Dataset):
     elif self.opt.err_reg:
       ocv_gt = err.copy()
 
-
+    # print(index, cam_num, )
     # correct camera indices w.r.t actual rotation
     ## 2 4
     ## 1 3
@@ -150,13 +153,24 @@ class H36M(data.Dataset):
     # img = (img.astype(np.float32) / 256. - self.mean) / self.std
     # img = img.transpose(2, 0, 1) # commented transpose in Crop
 
+    multi_cam_ind = []
+    if self.opt.multi_class:
+      for i,x in enumerate(ocv_gt):
+        if x==1:
+          multi_cam_ind.append(i)
+
+      while len(multi_cam_ind) < self.num_views:
+        multi_cam_ind.append(-1)
+
+      multi_cam_ind = torch.from_numpy(np.array(multi_cam_ind))
+
     # inp = torch.from_numpy(inp).float()
     inp = torch.from_numpy(inp)
     ocv_gt = torch.from_numpy(ocv_gt)
     # return inp, outMap, outReg, pts_3d_mono
     # return inp, ocv_gt
     # pdb.set_trace()
-    return inp, outMap, outReg, pts_3d_mono, ocv_gt
+    return inp, outMap, outReg, pts_3d_mono, ocv_gt, multi_cam_ind, info
     
   def __len__(self):
     return self.nSamples
