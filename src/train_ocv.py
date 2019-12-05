@@ -54,7 +54,7 @@ def step(split, epoch, opt, dataLoader, model, criterion, optimizer = None):
       debugger.addImg((input[0].numpy().transpose(1, 2, 0)*256).astype(np.uint8))
       debugger.addPoint2D(pred[0], (255, 0, 0))
       debugger.addPoint2D(gt[0], (0, 0, 255))
-      debugger.showImg()
+      # debugger.showImg()
       debugger.saveImg('debug/{}.png'.format(i))
 
     # print(preds_ocv.shape, ocv_gt.shape)

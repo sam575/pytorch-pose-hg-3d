@@ -93,7 +93,7 @@ class H36M(data.Dataset):
     err = self.annot['mpjpe'][index]
     min_err = np.min(err)
     min_err_ind = np.argmin(err)
-    if self.err_cam:
+    if self.opt.err_cam:
       min_err = np.max(err)
       min_err_ind = np.argmax(err)
     ocv_gt = np.zeros(self.num_views)

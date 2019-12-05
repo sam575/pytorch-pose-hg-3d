@@ -51,7 +51,7 @@ def main():
       state_dict = checkpoint['state_dict']
     else:
       state_dict = checkpoint.state_dict()
-    model.load_state_dict(state_dict, strict=False)
+    print(model.load_state_dict(state_dict, strict=False))
 
   if opt.freeze_layers:
     freeze_model(model, opt)
