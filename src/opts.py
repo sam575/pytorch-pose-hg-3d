@@ -21,7 +21,7 @@ class opts():
     self.parser.add_argument('-dropLR', type = int, default = 1000000, help = 'drop LR')
     self.parser.add_argument('-nEpochs', type = int, default = 20, help = '#training epochs')
     self.parser.add_argument('-valIntervals', type = int, default = 1, help = '#valid intervel')
-    self.parser.add_argument('-trainBatch', type = int, default = 64, help = 'Mini-batch size')
+    self.parser.add_argument('-trainBatch', type = int, default = 32, help = 'Mini-batch size')
     
     self.parser.add_argument('-nRegModules', type = int, default = 2, help = '#depth regression modules')
     self.parser.add_argument('-ratio3D', type = int, default = 1, help = 'weak label data ratio')

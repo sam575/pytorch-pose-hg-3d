@@ -108,7 +108,7 @@ class HourglassNet3D(nn.Module):
     for i in range(4):
       for j in range(self.nRegModules):
         if i==0 and j==0:
-          _ocj_layers_.append(Residual(self.opt.num_views*self.nFeats, self.nFeats))
+          _ocj_layers_.append(Residual(self.nFeats, self.nFeats))
         else:  
           _ocj_layers_.append(Residual(self.nFeats, self.nFeats))
 
@@ -154,7 +154,7 @@ class HourglassNet3D(nn.Module):
           x = self.ocj_layers_[i * self.nRegModules + j](x)
         x = self.maxpool(x)
       
-      x = x.view(ocj.size(0), -1)
+      x = x.view(x.size(0), -1)
       ocj_reg = self.ocj_reg(x)
 
       all_prob.append(ocj_reg)
