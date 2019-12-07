@@ -90,9 +90,9 @@ class HourglassNet3D(nn.Module):
       _ll_.append(nn.Conv2d(self.nFeats, self.nFeats, bias = True, kernel_size = 1, stride = 1))
       _tmpOut_.append(nn.Conv2d(ref.nJoints, self.nFeats, bias = True, kernel_size = 1, stride = 1))
 
-    # for i in range(4):
-    #   for j in range(self.nRegModules):
-    #     _reg_.append(Residual(self.nFeats, self.nFeats))
+    for i in range(4):
+      for j in range(self.nRegModules):
+        _reg_.append(Residual(self.nFeats, self.nFeats))
         
     self.hourglass = nn.ModuleList(_hourglass)
     self.Residual = nn.ModuleList(_Residual)
@@ -100,20 +100,24 @@ class HourglassNet3D(nn.Module):
     self.tmpOut = nn.ModuleList(_tmpOut)
     self.ll_ = nn.ModuleList(_ll_)
     self.tmpOut_ = nn.ModuleList(_tmpOut_)
-    # self.reg_ = nn.ModuleList(_reg_)
+    self.reg_ = nn.ModuleList(_reg_)
     
     # self.reg = nn.Linear(4 * 4 * self.nFeats, ref.nJoints)
 
-    _ocj_layers_ = []
-    for i in range(4):
-      for j in range(self.nRegModules):
-        if i==0 and j==0:
-          _ocj_layers_.append(Residual(self.nFeats, self.nFeats))
-        else:  
-          _ocj_layers_.append(Residual(self.nFeats, self.nFeats))
+    # _ocj_layers_ = []
+    # for i in range(4):
+    #   for j in range(self.nRegModules):
+    #     if i==0 and j==0:
+    #       _ocj_layers_.append(Residual(self.nFeats, self.nFeats))
+    #     else:  
+    #       _ocj_layers_.append(Residual(self.nFeats, self.nFeats))
 
-    self.ocj_layers_ = nn.ModuleList(_ocj_layers_)
-    self.ocj_reg = nn.Linear(4 * 4 * self.nFeats, 1)
+    # self.ocj_layers_ = nn.ModuleList(_ocj_layers_)
+    self.ocj_reg = nn.Sequential(
+      nn.Linear(4 * 4 * self.nFeats * self.opt.num_views, 512),
+      nn.ReLU(),
+      nn.Linear(512, 4)
+      )
     # if self.opt.err_reg:
     #   self.ocj_err_cls = nn.Linear(4 * 4 * self.nFeats, self.num_views) 
 
@@ -122,10 +126,11 @@ class HourglassNet3D(nn.Module):
     x_all = x_all.transpose(0,1)
     if x_all.shape[0] != self.opt.num_views:
       print('Error input',x_all.shape)
+    batch_size = x_all.shape[1]
 
     # print(x_all.shape[])
     out = []
-    all_prob = []  
+    all_cam = []  
     for x in x_all:
       # print(x.shape)
       x = self.conv1_(x)
@@ -151,15 +156,18 @@ class HourglassNet3D(nn.Module):
    
       for i in range(4):
         for j in range(self.nRegModules):
-          x = self.ocj_layers_[i * self.nRegModules + j](x)
+          x = self.reg_[i * self.nRegModules + j](x)
         x = self.maxpool(x)
       
       x = x.view(x.size(0), -1)
-      ocj_reg = self.ocj_reg(x)
 
-      all_prob.append(ocj_reg)
+      all_cam.append(x)
 
-    all_prob = torch.stack(all_prob).transpose(0,1).squeeze()
+    # 4,b,256 -> b,1024
+    all_cam = torch.stack(all_cam).transpose(0,1).view(batch_size, -1) # 
+    ocj_reg = self.ocj_reg(all_cam)
+
+    # all_prob = torch.stack(all_prob).transpose(0,1).squeeze()
    
-    return out, all_prob
+    return out, ocj_reg
 
