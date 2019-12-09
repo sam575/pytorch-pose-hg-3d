@@ -1,4 +1,4 @@
-# Optimal camera viewpoint classifier - Approach 1
+# Optimal camera viewpoint classifier
 
 The code is adapted from the following <a href="https://github.com/xingyizhou/pytorch-pose-hg-3d">repository</a> 
 
@@ -8,13 +8,15 @@ for the network presented in
 > ICCV 2017 ([arXiv:1704.02447](https://arxiv.org/abs/1704.02447))
 
 
-The code is implementation of Approach 2 and 3 as discussed in the report
+The code is implementation of Approach 1 as discussed in the report
 
 -  Single-view camera viewpoint classifier:
-
+```
 python main_ocv.py
+```
 
 
 - Multi-view camera viewpoint classifier:
-
+```
 python main_ocj.py
+```
