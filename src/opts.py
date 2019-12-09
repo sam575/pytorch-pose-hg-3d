@@ -17,7 +17,7 @@ class opts():
     self.parser.add_argument('-nStack', type = int, default = 2, help = '# hourglasses to stack')
     self.parser.add_argument('-nModules', type = int, default = 2, help = '# residual modules at each hourglass')
 
-    self.parser.add_argument('-LR', type = float, default = 2.5e-4, help = 'Learning Rate')
+    self.parser.add_argument('-LR', type = float, default = 2.5e-5, help = 'Learning Rate')
     self.parser.add_argument('-dropLR', type = int, default = 1000000, help = 'drop LR')
     self.parser.add_argument('-nEpochs', type = int, default = 20, help = '#training epochs')
     self.parser.add_argument('-valIntervals', type = int, default = 1, help = '#valid intervel')
@@ -55,7 +55,7 @@ class opts():
     self.opt.root_dir = os.path.join(os.path.dirname(__file__), '..')
     self.opt.data_dir = os.path.join(self.opt.root_dir, 'data')
     self.opt.gpus = [int(gpu) for gpu in self.opt.gpus.split(',')]
-    self.opt.train_half = False
+    self.opt.train_half = True
     # self.opt.scale_loss3d = 5
     self.opt.num_views = 4
     self.opt.freeze_layers = True

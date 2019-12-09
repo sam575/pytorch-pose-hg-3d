@@ -114,8 +114,12 @@ class HourglassNet3D(nn.Module):
 
     # self.ocj_layers_ = nn.ModuleList(_ocj_layers_)
     self.ocj_reg = nn.Sequential(
-      nn.Linear(4 * 4 * self.nFeats * self.opt.num_views, 512),
+      nn.Linear(4 * 4 * self.nFeats * self.opt.num_views, 2048),
       nn.ReLU(),
+      nn.Dropout(0.6),
+      nn.Linear(2048,512),
+      nn.ReLU(),
+      nn.Dropout(0.5),
       nn.Linear(512, 4)
       )
     # if self.opt.err_reg:
@@ -164,7 +168,7 @@ class HourglassNet3D(nn.Module):
       all_cam.append(x)
 
     # 4,b,256 -> b,1024
-    all_cam = torch.stack(all_cam).transpose(0,1).view(batch_size, -1) # 
+    all_cam = torch.stack(all_cam).transpose(0,1).reshape(batch_size, -1) # 
     ocj_reg = self.ocj_reg(all_cam)
 
     # all_prob = torch.stack(all_prob).transpose(0,1).squeeze()

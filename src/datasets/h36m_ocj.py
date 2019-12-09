@@ -5,7 +5,7 @@ import torch
 from h5py import File
 import cv2
 from utils.utils import Rnd, Flip, ShuffleLR
-from utils.img import Crop, DrawGaussian, Transform3D
+# from utils.img import Crop, DrawGaussian, Transform3D
 
 # from utils.img_old import Crop, DrawGaussian, Transform3D
 from utils.img import Crop, DrawGaussian, Transform3D
@@ -144,10 +144,15 @@ class H36M(data.Dataset):
       pts, c, s, pts_3d, pts_3d_mono = self.GetPartInfo(index, cam_num)   
       pts_3d[7] = (pts_3d[12] + pts_3d[13]) / 2
 
-      inp = Crop(img, c, s, 0, ref.inputRes) / 256
+      inp = Crop(img, c, s, 0, ref.inputRes) / 256.
       all_inps.append(inp)
 
     all_inps = np.stack(all_inps)
+
+    # shuffle cam inds
+    shuffle_inds = np.random.permutation(self.opt.num_views)
+    all_inps = all_inps[shuffle_inds]
+    ocv_gt = ocv_gt[shuffle_inds]
 
     outMap = np.zeros((ref.nJoints, ref.outputRes, ref.outputRes))
     outReg = np.zeros((ref.nJoints, 3))

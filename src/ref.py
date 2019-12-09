@@ -31,4 +31,4 @@ mpiiImgDir = '/home/zxy/Datasets/mpii/images/'
 h36mImgDir = '/home/zxy/Datasets/Human3.6M/images/'
 expDir = '../exp'
 
-nThreads = 6
+nThreads = 8

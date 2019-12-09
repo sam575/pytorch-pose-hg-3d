@@ -82,11 +82,15 @@ def main():
   #       num_workers = int(ref.nThreads)
   #   )
   # else:
+  if opt.test:
+    val_shuffle = False
+  else:
+    val_shuffle = True
   val_loader = torch.utils.data.DataLoader(
       H36M(opt, 'val'), 
       batch_size = opt.trainBatch, 
       # batch_size = 1, 
-      shuffle = False,
+      shuffle = True,
       num_workers = int(ref.nThreads)
     )
   
