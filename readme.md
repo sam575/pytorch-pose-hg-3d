@@ -10,13 +10,7 @@ for the network presented in
 
 The code is implementation of Approach 1 as discussed in the report
 
--  Single-view camera viewpoint classifier:
+-  Camera viewpoint classifier:
 ```
 python main_ocv.py
-```
-
-
-- Multi-view camera viewpoint classifier:
-```
-python main_ocj.py
 ```
